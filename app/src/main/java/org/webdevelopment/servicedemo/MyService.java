@@ -3,6 +3,7 @@ package org.webdevelopment.servicedemo;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,9 +15,11 @@ public class MyService extends IntentService {
 
     public static final String EXTRA_Message = "message";
     private Handler handler;
+    private int counter = 0;
 
 
 
+    //needed to start the worker thread in the super class.
     public MyService()
     {
         super("MyService");
@@ -36,7 +39,7 @@ public class MyService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         synchronized (this) {
             try {
-                wait(5000); //wait 5 seconds
+                wait(1000); //wait 5 seconds
             } catch (InterruptedException e)
             {
 
@@ -44,6 +47,12 @@ public class MyService extends IntentService {
         }
         String text = intent.getStringExtra(EXTRA_Message);
         showText(text);
+        Intent in = new Intent("message");
+        in.putExtra("service", "Hello from the service class: "+counter);
+        counter++;
+        //Put your all data using put extra
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
     }
 

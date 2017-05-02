@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null ) {
-                String str= intent.getStringExtra("service");
+                String str= intent.getStringExtra(MyService.SERVICE_DATA);
                 System.out.println("on receive:"+str);
 
                 textView.setText(str);
@@ -37,13 +37,14 @@ public class MainActivity extends Activity {
         Button button = (Button) findViewById(R.id.startButton);
         textView = (TextView) findViewById(R.id.messageText);
         broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(mMessageReceiver,new IntentFilter("message"));
+        broadcastManager.registerReceiver(mMessageReceiver,new IntentFilter(MyService.BROADCAST_KEY));
         context = this;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                textView.setText(""); //reset the text.
                 Intent intent = new Intent(context,MyService.class);
-                intent.putExtra(MyService.EXTRA_Message,"my message!");
+                intent.putExtra(MyService.EXTRA_MESSAGE,"my message!");
                 startService(intent);
             }
         });

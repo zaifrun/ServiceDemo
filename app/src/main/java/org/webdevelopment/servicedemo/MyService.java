@@ -13,7 +13,9 @@ import android.widget.Toast;
 
 public class MyService extends IntentService {
 
-    public static final String EXTRA_Message = "message";
+    public static final String EXTRA_MESSAGE = "message";
+    public static final String BROADCAST_KEY = "broadcastdata";
+    public static final String SERVICE_DATA = "servicedata";
     private Handler handler;
     private int counter = 0;
 
@@ -35,24 +37,31 @@ public class MyService extends IntentService {
     }
 
     //runs in a background thread.
+    //the service gets an intent to start it.
     @Override
     protected void onHandleIntent(Intent intent) {
-        synchronized (this) {
-            try {
-                wait(1000); //wait 5 seconds
-            } catch (InterruptedException e)
-            {
+        Intent in = new Intent(BROADCAST_KEY);
+        in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
+        //Put your all data using put extra
+        LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
+        while (counter<5) {
+            synchronized (this) {
+                try {
+                    wait(1000); //wait some seconds
+                    counter++;
+                    in = new Intent(BROADCAST_KEY);
+                    in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
+                    //Put your all data using put extra
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(in);
+
+                } catch (InterruptedException e) {
+                   }
             }
         }
-        String text = intent.getStringExtra(EXTRA_Message);
+        //service is finished now
+        String text = intent.getStringExtra(EXTRA_MESSAGE);
         showText(text);
-        Intent in = new Intent("message");
-        in.putExtra("service", "Hello from the service class: "+counter);
-        counter++;
-        //Put your all data using put extra
-
-        LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
     }
 

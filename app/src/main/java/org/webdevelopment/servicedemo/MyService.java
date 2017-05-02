@@ -1,6 +1,9 @@
 package org.webdevelopment.servicedemo;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -13,9 +16,18 @@ import android.widget.Toast;
 
 public class MyService extends IntentService {
 
+    /* constant used for passing data to the Service */
     public static final String EXTRA_MESSAGE = "message";
+
+    /* key for what the BroadCastReceiver */
     public static final String BROADCAST_KEY = "broadcastdata";
+
+    //returning data from the service to the broadcast receiver */
     public static final String SERVICE_DATA = "servicedata";
+
+    //progress information from Service to BroadCastReceiver */
+    public static final String SERVICE_PROGRESS = "serviceProgress";
+
     private Handler handler;
     private int counter = 0;
 
@@ -42,6 +54,8 @@ public class MyService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Intent in = new Intent(BROADCAST_KEY);
         in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
+        in.putExtra(SERVICE_PROGRESS,counter);
+
         //Put your all data using put extra
         LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
@@ -52,6 +66,7 @@ public class MyService extends IntentService {
                     counter++;
                     in = new Intent(BROADCAST_KEY);
                     in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
+                    in.putExtra(SERVICE_PROGRESS,counter);
                     //Put your all data using put extra
                     LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
@@ -62,6 +77,22 @@ public class MyService extends IntentService {
         //service is finished now
         String text = intent.getStringExtra(EXTRA_MESSAGE);
         showText(text);
+        showNotification("Service done",text);
+
+    }
+
+    public void showNotification(String title,String message)
+    {
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_DEFAULT)
+                .setContentText(message)
+                .build();
+        NotificationManager manager = (NotificationManager)
+                getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(42,notification);
 
     }
 

@@ -45,7 +45,24 @@ public class MyService extends IntentService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handler = new Handler();
-        return super.onStartCommand(intent, flags, startId);
+        super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
+        //super.onStartCommand(intent, flags, startId);
+    }
+
+
+    @Override
+    public void onCreate() {
+        Log.d("MYSERVICE","Service CREATED");
+
+        super.onCreate();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MYSERVICE","Service Destroyed");
+        super.onDestroy();
     }
 
     //runs in a background thread.
@@ -55,7 +72,7 @@ public class MyService extends IntentService {
         Intent in = new Intent(BROADCAST_KEY);
         in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
         in.putExtra(SERVICE_PROGRESS,counter);
-
+        Log.d("MYSERVICE","count: "+counter);
         //Put your all data using put extra
         LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
@@ -64,6 +81,7 @@ public class MyService extends IntentService {
                 try {
                     wait(1000); //wait some seconds
                     counter++;
+                    Log.d("MYSERVICE","count: "+counter);
                     in = new Intent(BROADCAST_KEY);
                     in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
                     in.putExtra(SERVICE_PROGRESS,counter);
@@ -71,6 +89,7 @@ public class MyService extends IntentService {
                     LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
                 } catch (InterruptedException e) {
+                    Log.d("MYSERVICE","INTERRUPTED EXCEPTION");
                    }
             }
         }

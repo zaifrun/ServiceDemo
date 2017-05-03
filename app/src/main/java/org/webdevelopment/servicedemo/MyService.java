@@ -46,17 +46,16 @@ public class MyService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         handler = new Handler();
         super.onStartCommand(intent, flags, startId);
+        //the return statement says that we want Android
+        //to restart the service if our app is killed.
         return START_REDELIVER_INTENT;
-        //super.onStartCommand(intent, flags, startId);
     }
 
 
     @Override
     public void onCreate() {
         Log.d("MYSERVICE","Service CREATED");
-
         super.onCreate();
-
     }
 
     @Override
@@ -69,6 +68,7 @@ public class MyService extends IntentService {
     //the service gets an intent to start it.
     @Override
     protected void onHandleIntent(Intent intent) {
+        //make a new intent to send to the activity
         Intent in = new Intent(BROADCAST_KEY);
         in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
         in.putExtra(SERVICE_PROGRESS,counter);
@@ -85,7 +85,7 @@ public class MyService extends IntentService {
                     in = new Intent(BROADCAST_KEY);
                     in.putExtra(SERVICE_DATA, "Hello from the service class: "+counter);
                     in.putExtra(SERVICE_PROGRESS,counter);
-                    //Put your all data using put extra
+                    //update the activity by sending a broadcast
                     LocalBroadcastManager.getInstance(this).sendBroadcast(in);
 
                 } catch (InterruptedException e) {
@@ -93,24 +93,34 @@ public class MyService extends IntentService {
                    }
             }
         }
-        //service is finished now
+        //service is finishing now - send final notification
+        //and show a toast.
         String text = intent.getStringExtra(EXTRA_MESSAGE);
-        showText(text);
-        showNotification("Service done",text);
+        if (text==null)
+            text = "";
+        if (text!=null) {
+            if (text!="") showText(text);
+            showNotification("Service done", text);
+        }
 
     }
 
+    //This shows a toast
     public void showNotification(String title,String message)
     {
+        //build the notification using the builder.
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher)  //icon
                 .setContentTitle(title)
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_DEFAULT)
                 .setContentText(message)
                 .build();
+
+        //use the built in notification service
         NotificationManager manager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
+        //the 42 is just a ID number you choose.
         manager.notify(42,notification);
 
     }
